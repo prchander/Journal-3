@@ -1,0 +1,103 @@
+
+\documentclass[10pt,conference]{IEEEtran}
+
+\usepackage{graphicx}
+\usepackage{refstyle}
+\usepackage{authblk}
+%\usepackage{xcolor}
+\usepackage[table]{xcolor}
+
+% For figures
+\usepackage{caption}
+\usepackage{subcaption}
+
+% For tables
+\usepackage{lscape}
+
+% For pseudocode
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{amssymb}
+
+% For positioning figures
+\usepackage{float}
+
+% For author comments
+\usepackage{xargs}
+
+% Enable clickable citations \sw{Do we want this?}
+\usepackage[hidelinks]{hyperref}
+
+% Drawing colored circles
+\usepackage{tikz}
+\newcommand{\cir}[2][red,fill=red]{\tikz[baseline=-0.5ex]\draw[#1,radius=#2] (0,0) circle ;}%
+
+
+\newtheorem{insight}{Insight}
+
+\definecolor{classical}{HTML}{4AF896}
+\definecolor{post-quantum}{HTML}{4B288F}
+\definecolor{hybrid}{HTML}{F54FA1}
+
+\definecolor{classical_light}{HTML}{AEF8D4}
+\definecolor{post-quantum_light}{HTML}{877CD3}
+\definecolor{hybrid_light}{HTML}{F590C6}
+
+
+\newcommand{\syc}[1]{\textbf{\textcolor{blue}{SC: #1}}}
+\newcommand{\mr}[1]{\textbf{\textcolor{orange}{MR: #1}}}
+\newcommand{\pr}[1]{\textbf{\textcolor{purple}{PI: #1}}}
+\newcommand{\sw}[1]{\textbf{\textcolor{red}{SW: #1}}}
+
+\renewcommand{\baselinestretch}{1.00}
+
+
+\begin{document}
+
+
+\title{Journal 3 CS 6000}
+
+\input{authors}
+
+\maketitle
+%\vspace{-0.00in}
+
+\input{abstract}
+
+\begin{IEEEkeywords}
+CS 6000 assignment
+%Public Key Infrastructure.
+\end{IEEEkeywords}
+%\vspace{-0.04in}
+\section{Research direction}
+\label{sec:Research direction}
+Majority of people still use the default Domain Name System configuration in their system. The default DNS configuration is still DNS over UDP. Traditional DNS is un-encrypted and leaves it vulnerable to Man-in-the-middle attacks, DNS manipulation, and privacy issues. The introduction of secure DNS like DNS over TLS, and DNS over HTTPS. These secure DNS protocols have their own set of privacy issues, and I will be reading all possible DNS attacks that the secure DNS protocols are still vulnerable. I will also be looking into Oblivious DNS to see how that increases latency and other measurements for DNS performance.
+
+\section{DNS fingerprinting \cite{siby2019encrypted}}
+DNS fingerprinting based on DNS traffic uniqueness based on websites. Machine learning models show how different website traffic is different. The traffic was monitored for DNS over Tor, DNS over TLS, DNS over HTTPS, and DNS over HTTPS with padding. Using a script, they collected data to gather DNS traffic for Alexa's top 500 websites. Using the data collected, they compare them to the models to figure out which website it is. DNS over TLS sends DNS traffic in the TLS port, and DNS over HTTPS sends it over HTTPS which merges it with HTTPS traffic but the HTTPS traffic is unique which makes fingerprinting easier so DNS over TLS traffic is the hardest to fingerprint. They also use this data to test in real world applications like censorship of certain websites in different countries. This tests real world effects of DNS fingerprinting. With DNS over TLS and a DNS resolver like Cloudflare, DNS over TLS also allows more users to visit more websites than other secure DNS protocols. The use of padding in all of these protocols makes DNS fingerprinting harder as well. 
+
+This is a paper that is cited a lot as it tests all secure DNS protocols including with padding. Using DNS fingerprinting methods to test the privacy of all protocols. This including the test of real world applications of censorship really shows how the data translates into real world improvements for the user. 
+
+\section{Cost of DNS over HTTPS \cite{bottger2019empirical}}
+DNS over HTTPS was launched after DNS over TLS but it has gain more popularity that DNS over TLS. The added security that comes with DNS over HTTPS with sending traffic over the HTTPS port along with other HTTPS traffic. If there is a lot of traffic on the HTTPS port then there can be added latency for resolution. The experiment consisted of DNS over TLS, DNS over HTTPS, and DNS over TLS clients with scripts that request cloudflare to resolve the links for websites in the Alexa top 500 websites. From their observation DNS over HTTPS has a 3 ms added latency over DNS over UDP. With the addred latency, they find all traffic along with HTTPS traffic sent to Google DNS on Chrome and to Cloudflare on Firefox. This runs as elevated privileges so even if the user does not set it up, it sends traffic to these servers by default. These practices add latency to the query and allows HTTPS revolvers like Google to collect data but because webrowsers enable DNS over HTTPS by default there are more number of users who use Google Chrome. The addition of sending the traffic over HTTPS does solve the Man-in-the-middle attacks and DNS snooping. The added latency is a tradeoff that is worth the added security. This is the least cited paper it is a very surface level evaluation of all the tradeoffs associated with DNS over HTTPS then backing them up with performance metrics. 
+
+\section{Oblivious DNS over HTTPS \cite{singanamalla2020oblivious}}
+DNS over HTTPS adds lots of positives with the loss privacy. Oblivious DNS solves the privacy issues by adding a proxy in the middle of the DNS over HTTPS connection. In this new system, the client encrypts the DNS query with the public key of the DNS resolver and sends it to the proxy. The proxy does not know the query but just the client ip. Then the proxy sends just the query to the resolver. The resolver then sends the resolved ip by encrypting it with the client public key. This way the proxy does not know the query, and the resolver does not know the ip. This way no usefull data can be build increasing privacy of the user. This increases latency even further so the authors redo all tests from other papers listed above to show the privacy improvements and the latency differences. After redoing the testing Oblivious DNS improves privacy. Oblivious DNS increases the latency compared to DNS over UDP by 8 ms but this is faster than the 25 ms of DNS over tor. The added privacy benefit of Oblivious DNS is achieved without adding too much latency like with DNS over tor. 
+
+My research is based on oblivious DNS so this paper will be the most related to my paper. From all the readings, I will be going with how DNS fingerprinting is effected with Oblivious DNS.
+
+\section{Mutualised oblivious DNS \cite{kurihara2021mutualized}}
+This builds on top of Oblivious DNS with the concern of what if the Proxy and the resolver are controlled with the same entity. This kind of attack would compromise use privacy with the expense of all that added latency. This version of Oblivious DNS makes the proxy change at random. This reduces the risk of these proxies to be controlled by a single entity. with redoing all DNS experiments, yes there is an added improvement to privacy but the latency varies based on the location of various proxies. Since the proxies are controlled by various sources, sometimes they are located further that where the user is. Oblivious DNS is however controlled by two separate entities so the additional proxies will add more latency for the same privacy benefit.
+
+This paper is also not cited as much as there isn't much details on the implementation of Mutualised DNS it is however a very interesting idea especially if the proxies are on a blockchain. This will allow for a truly no central control over the proxy increasing user privacy.
+
+\subsection{Blockchain based DNS \cite{hsieh2022use}}
+Putting the DNS resolvers on the blockchain is a very innovative of using the distributed ledger. This paper uses DNS over UDP just to test how DNS resolvers improve on privacy when resolvers are in a blockchain. This has been tested on the Ethereum blockchain using smart contracts. This paper is where I want to take my research. Oblivious DNS with proxy in a blockchain. The DNS resolvers in the Ethereum blockchain will be expensive as Ethereum gas fees but placing the resolvers on Flux would be a lot cheaper and easier to deploy at multiple location around the world. There is little research on using secure DNS with blockchain. This would be a good research direction to expand on doing the same experiments along with the privacy improvements. 
+
+Blockchain deployment especially will also bring other benefits including getting a new node up when one is attacked. This also preserves the redundancy of the system.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references.bib}
+
+\end{document}
